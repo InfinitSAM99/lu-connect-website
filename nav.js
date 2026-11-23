@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="logo-icon">LU</div>
             <div class="logo-text">CONNECT</div>
         </a>
-        <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+        <button class="menu-toggle" id="menuToggleBtn">☰</button>
     `;
     document.body.prepend(header);
 
@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <a href="index.html">Home</a>
         <a href="download.html">Download App</a>
         <a href="help.html">Help Center</a>
-        <a href="student-admin.html">Student Admin</a>
         <a href="about.html">About Us</a>
         <a href="privacy.html">Privacy Policy</a>
         <a href="contact.html">Contact Us</a>
@@ -51,13 +50,30 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.body.appendChild(footer);
 
+    // Hide Spinner
     setTimeout(() => {
         spinner.style.opacity = '0';
         setTimeout(() => spinner.remove(), 500);
     }, 800);
 
+    // Active Link Highlighting
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     sidebar.querySelectorAll('a').forEach(link => {
         if (link.getAttribute('href') === currentPage) link.classList.add('active');
+    });
+
+    // NEW: Fix Mobile Menu Toggle & Auto-Close
+    const toggleBtn = document.getElementById('menuToggleBtn');
+    
+    // Toggle menu when hamburger is clicked
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+    });
+
+    // Auto-close menu when a link is clicked
+    sidebar.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
     });
 });

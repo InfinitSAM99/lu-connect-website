@@ -3,62 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LU Connect - Download</title>
+    <title>LU Connect - Download App</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .download-hero { text-align: center; padding: 40px 0 20px; }
+        .download-hero h1 { font-size: 42px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+        .download-hero p { color: #6d7382; font-size: 18px; max-width: 500px; margin: 0 auto 30px; }
+        
+        .download-card { 
+            background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 24px; 
+            padding: 40px 30px; max-width: 450px; margin: 0 auto; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .version-tag { 
+            display: inline-block; background: rgba(255, 215, 0, 0.1); color: #FFD700; 
+            padding: 8px 16px; border-radius: 20px; font-weight: 700; margin-bottom: 20px;
+            font-size: 14px; border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .download-btn { 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 18px; border-radius: 16px; font-size: 18px; font-weight: 700;
+            background: #ef4444; color: #fff; text-decoration: none; transition: 0.3s;
+            box-sizing: border-box; margin-top: 20px;
+        }
+        .download-btn:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(239,68,68,0.4); }
+        .download-btn.loading { background: #333; cursor: wait; pointer-events: none; color: #6d7382; }
+        .file-info { margin-top: 15px; font-size: 13px; color: #6d7382; min-height: 20px; }
+
+        .instructions { 
+            max-width: 450px; margin: 30px auto; background: #0a0a0a; 
+            border: 1px solid #1f1f1f; border-radius: 20px; padding: 30px; 
+        }
+        .instructions h3 { color: #FFD700; margin-bottom: 15px; }
+        .instructions ol { color: #a1a1aa; margin-left: 20px; line-height: 1.8; }
+        .instructions li { margin-bottom: 10px; }
+    </style>
 </head>
 <body>
     <div class="main-content">
         <div class="container">
-            <div class="hero">
+            
+            <div class="download-hero">
                 <h1>Get the App</h1>
                 <p>Download the latest version of LU Connect for Android.</p>
             </div>
 
-            <div class="card" style="text-align: center;">
-                <h3>Download APK</h3>
-                <p id="version-text" style="margin-bottom: 20px; color: #6d7382;">Checking for latest version...</p>
-                <a href="#" id="download-btn" class="btn btn-gold" style="opacity: 0.5; pointer-events: none;">
-                    ⬇ Download APK
+            <!-- AUTOMATIC DOWNLOAD CARD -->
+            <div class="download-card">
+                <div id="versionTag" class="version-tag">Fetching latest release...</div>
+                
+                <h2 style="color: #fff; font-size: 24px; margin-bottom: 5px;">LU Connect Native</h2>
+                <p style="color: #6d7382; font-size: 14px;">Experience your campus, connected.</p>
+
+                <!-- Bulletproof fallback link built-in -->
+                <a href="https://github.com/InfinitSAM99/lu-connect-native/releases/download/native-build-16/lu-connect-native-16.apk" id="downloadBtn" class="download-btn">
+                    <span id="btnText">⬇ Download APK</span>
                 </a>
+                <div id="fileInfo" class="file-info">133 MB • Latest Build</div>
             </div>
 
-            <div class="card" style="margin-top: 20px;">
+            <!-- INSTALLATION INSTRUCTIONS -->
+            <div class="instructions">
                 <h3>How to Install</h3>
-                <p>1. Download the APK file.<br>2. Open it on your Android phone.<br>3. Tap "Install" and enjoy LU Connect.</p>
+                <ol>
+                    <li>Tap the <strong>Download</strong> button above.</li>
+                    <li>Open the downloaded APK file on your phone.</li>
+                    <li>If prompted, allow "Install from Unknown Sources" in your settings.</li>
+                    <li>Tap <strong>Install</strong> and open LU Connect.</li>
+                    <li>Log in with your university email and start connecting!</li>
+                </ol>
             </div>
+
         </div>
     </div>
+
     <script src="nav.js"></script>
-    
-    <!-- 🔥 THE MAGIC SCRIPT: Fetch latest APK from GitHub -->
     <script>
-        async function fetchLatestAPK() {
+        // We use the GitHub API to get the absolute latest version if available
+        const GITHUB_OWNER = 'InfinitSAM99'; 
+        const GITHUB_REPO = 'lu-connect-native';
+
+        async function fetchLatestRelease() {
+            const versionTag = document.getElementById('versionTag');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const btnText = document.getElementById('btnText');
+            const fileInfo = document.getElementById('fileInfo');
+
             try {
-                // Replace 'InfinitSAM99/lu-connect-native' with your actual GitHub repo
-                const response = await fetch('https://api.github.com/repos/InfinitSAM99/lu-connect-native/releases/latest');
-                const data = await response.json();
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`);
                 
-                if (data.assets && data.assets.length > 0) {
-                    // Find the .apk file in the release assets
-                    const apkAsset = data.assets.find(asset => asset.name.endsWith('.apk'));
-                    
-                    if (apkAsset) {
-                        document.getElementById('version-text').innerText = `Latest Version: ${data.tag_name} (${(apkAsset.size / 1024 / 1024).toFixed(1)} MB)`;
-                        
-                        const btn = document.getElementById('download-btn');
-                        btn.href = apkAsset.browser_download_url;
-                        btn.style.opacity = '1';
-                        btn.style.pointerEvents = 'auto';
-                    }
+                if (!response.ok) throw new Error('API Rate Limit or No Release');
+
+                const data = await response.json();
+                const apkAsset = data.assets.find(asset => asset.name.endsWith('.apk'));
+
+                if (apkAsset) {
+                    // Update UI with latest live data
+                    versionTag.innerText = `Latest Version: ${data.tag_name}`;
+                    downloadBtn.href = apkAsset.browser_download_url;
+                    btnText.innerText = '⬇ Download Latest APK';
+                    const sizeMB = (apkAsset.size / (1024 * 1024)).toFixed(1);
+                    fileInfo.innerText = `${apkAsset.name} • ${sizeMB} MB`;
                 }
-            } catch (e) {
-                console.error("Error fetching release:", e);
-                document.getElementById('version-text').innerText = "Could not fetch the latest version. Please try again later.";
+
+            } catch (error) {
+                console.warn("GitHub API error. Using hardcoded fallback link.");
+                // If the API fails, the UI keeps the hardcoded fallback link you already have in the HTML!
+                versionTag.innerText = 'Latest Release (Build 16)';
+                versionTag.style.color = '#FFD700';
+                versionTag.style.borderColor = 'rgba(255, 215, 0, 0.3)';
             }
         }
-        
-        // Run the function when the page loads
-        fetchLatestAPK();
+
+        document.addEventListener('DOMContentLoaded', fetchLatestRelease);
     </script>
 </body>
 </html>

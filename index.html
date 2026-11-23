@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LU Connect - Home</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="main-content">
@@ -30,6 +31,17 @@
                             <div class="tagline">Your Campus. Connected.</div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="stats-container" style="display: flex; justify-content: center; gap: 30px; margin: 40px 0; flex-wrap: wrap; text-align: center;">
+                <div class="stat-box" style="background: #0a0a0a; padding: 20px 40px; border-radius: 16px; border: 1px solid #1f1f1f;">
+                    <h2 id="stat-users" style="color: #FFD700; margin: 0; font-size: 36px;">--</h2>
+                    <p style="color: #6d7382; margin: 5px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Students</p>
+                </div>
+                <div class="stat-box" style="background: #0a0a0a; padding: 20px 40px; border-radius: 16px; border: 1px solid #1f1f1f;">
+                    <h2 id="stat-posts" style="color: #FFD700; margin: 0; font-size: 36px;">--</h2>
+                    <p style="color: #6d7382; margin: 5px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Posts</p>
                 </div>
             </div>
 
@@ -106,5 +118,22 @@
         </div>
     </div>
     <script src="nav.js"></script>
+<script>
+        const SUPABASE_URL = "https://uuuqlzsczxekyfliviiv.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_PVDBNFNYrV7-KfWwNGYnug_PTA0_b1E";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function loadStats() {
+            // Fetch user count (Change "profiles" if your table is named differently)
+            const { count: userCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
+            if (userCount !== null) document.getElementById("stat-users").innerText = userCount + "+";
+
+            // Fetch post count (Change "posts" if your table is named differently)
+            const { count: postCount } = await supabase.from("posts").select("*", { count: "exact", head: true });
+            if (postCount !== null) document.getElementById("stat-posts").innerText = postCount + "+";
+        }
+
+        loadStats();
+    </script>
 </body>
 </html>
