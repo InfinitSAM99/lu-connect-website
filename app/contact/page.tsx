@@ -13,7 +13,7 @@ export default function Contact() {
     setStatus({ type: "", msg: "" });
 
     const formData = new FormData(e.currentTarget);
-    const { error } = await supabase.from("messages").insert([{
+    const { error } = await supabase.from("contact_messages").insert([{
       name: formData.get("name"),
       email: formData.get("email"),
       message: formData.get("message")
