@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, X } from "lucide-react";
+import { Sun, Moon, X, ShieldCheck } from "lucide-react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -32,7 +32,7 @@ export default function Sidebar() {
           </div>
           <span className="text-xl font-black text-luRed tracking-[-1px]">CONNECT</span>
         </Link>
-        
+
         <div className="flex items-center gap-3">
           {/* Theme Toggle */}
           {mounted && (
@@ -53,7 +53,7 @@ export default function Sidebar() {
       </header>
 
       {/* Mobile Backdrop */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] transition-opacity duration-300 md:hidden ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
@@ -61,29 +61,48 @@ export default function Sidebar() {
       ></div>
 
       {/* Sidebar / Drawer */}
-      <div 
-        className={`fixed top-0 left-0 w-[220px] md:w-[250px] h-screen bg-surface border-r border-border pt-20 z-[90] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:translate-x-0 ${
+      <div
+        className={`fixed top-[70px] left-0 w-[220px] md:w-[250px] h-[calc(100vh-70px)] bg-surface border-r border-border z-[90] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } flex flex-col`}
       >
-        {links.map((link, i) => {
-          const isActive = pathname === link.href;
-          return (
-            <Link 
-              key={link.href} 
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              style={{ transitionDelay: isOpen ? `${i * 50}ms` : '0ms' }}
-              className={`block py-3 px-5 text-sm font-semibold border-l-[3px] transition-all duration-300 ${
-                isActive 
-                  ? 'text-text bg-luRed/10 border-luRed' 
-                  : 'text-muted border-transparent hover:text-text hover:bg-luRed/10 hover:border-luRed'
-              }`}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
+        {/* Scrollable Links Area */}
+        <div className="flex-1 overflow-y-auto py-4">
+          {links.map((link, i) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                style={{ transitionDelay: isOpen ? `${i * 50}ms` : '0ms' }}
+                className={`block py-3 px-5 text-sm font-semibold border-l-[3px] transition-all duration-300 ${
+                  isActive
+                    ? 'text-text bg-luRed/10 border-luRed'
+                    : 'text-muted border-transparent hover:text-text hover:bg-luRed/10 hover:border-luRed'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Fixed Admin Portal Link at Bottom */}
+        <div className="border-t border-border/50 pb-4 shrink-0">
+          <Link
+            href="/admin-download"
+            onClick={() => setIsOpen(false)}
+            className={`flex items-center gap-2 py-3 px-5 text-sm font-semibold border-l-[3px] transition-all duration-300 ${
+              pathname === "/admin-download"
+                ? 'text-luGold bg-luGold/10 border-luGold'
+                : 'text-neutral-500 border-transparent hover:text-luGold hover:bg-luGold/10 hover:border-luGold'
+            }`}
+          >
+            <ShieldCheck size={16} className={pathname === "/admin-download" ? "text-luGold" : "text-neutral-500"} />
+            Admin Portal
+          </Link>
+        </div>
       </div>
     </>
   );
