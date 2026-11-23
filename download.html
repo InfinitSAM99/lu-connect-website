@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LU Connect - Download</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <div class="hero">
+                <h1>Get the App</h1>
+                <p>Download the latest version of LU Connect for Android.</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <h3>Download APK</h3>
+                <p id="version-text" style="margin-bottom: 20px; color: #6d7382;">Checking for latest version...</p>
+                <a href="#" id="download-btn" class="btn btn-gold" style="opacity: 0.5; pointer-events: none;">
+                    ⬇ Download APK
+                </a>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3>How to Install</h3>
+                <p>1. Download the APK file.<br>2. Open it on your Android phone.<br>3. Tap "Install" and enjoy LU Connect.</p>
+            </div>
+        </div>
+    </div>
+    <script src="nav.js"></script>
+    
+    <!-- 🔥 THE MAGIC SCRIPT: Fetch latest APK from GitHub -->
+    <script>
+        async function fetchLatestAPK() {
+            try {
+                // Replace 'InfinitSAM99/lu-connect-native' with your actual GitHub repo
+                const response = await fetch('https://api.github.com/repos/InfinitSAM99/lu-connect-native/releases/latest');
+                const data = await response.json();
+                
+                if (data.assets && data.assets.length > 0) {
+                    // Find the .apk file in the release assets
+                    const apkAsset = data.assets.find(asset => asset.name.endsWith('.apk'));
+                    
+                    if (apkAsset) {
+                        document.getElementById('version-text').innerText = `Latest Version: ${data.tag_name} (${(apkAsset.size / 1024 / 1024).toFixed(1)} MB)`;
+                        
+                        const btn = document.getElementById('download-btn');
+                        btn.href = apkAsset.browser_download_url;
+                        btn.style.opacity = '1';
+                        btn.style.pointerEvents = 'auto';
+                    }
+                }
+            } catch (e) {
+                console.error("Error fetching release:", e);
+                document.getElementById('version-text').innerText = "Could not fetch the latest version. Please try again later.";
+            }
+        }
+        
+        // Run the function when the page loads
+        fetchLatestAPK();
+    </script>
+</body>
+</html>
