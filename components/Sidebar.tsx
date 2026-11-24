@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, X, ShieldCheck } from "lucide-react";
+import { Sun, Moon, X, ShieldCheck, User } from "lucide-react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -20,6 +20,7 @@ export default function Sidebar() {
     { href: "/about", label: "About Us" },
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/contact", label: "Contact Us" },
+    { href: "/account", label: "My Account" }, // <-- ADDED
   ];
 
   return (

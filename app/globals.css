@@ -34,3 +34,54 @@
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #333; }
+
+/* Custom LU Connect Glass Spinner Animations */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+.animate-spin-reverse {
+  animation: spin-reverse 4s linear infinite;
+}
+
+/* LU Connect Premium Neon Loader Animations */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.2;
+    filter: drop-shadow(0 0 0px currentColor);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px currentColor);
+  }
+}
+
+@keyframes float-pulse {
+  0%, 100% { transform: scale(0.95); }
+  50% { transform: scale(1.02); }
+}
+
+/* Ultra-smooth LU Loader Animations */
+@keyframes bar-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    /* A tiny scale for a breathing effect */
+    transform: scale(0.95) rotate(45deg); 
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@keyframes float-pulse {
+  0%, 100% { transform: translateY(0px) scale(0.98); }
+  50% { transform: translateY(-5px) scale(1.02); }
+}
