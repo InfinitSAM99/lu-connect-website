@@ -17,18 +17,34 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
-      setError(error.message);
+    if (authError) {
+      setError(authError.message);
       setLoading(false);
-    } else {
-      // Force a hard reload to the account page so the server reads the new cookie
-      window.location.href = "/account"; 
+      return;
     }
+
+    // After successful login, check the profile status
+    if (authData.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('approval_status, is_suspended, suspension_reason')
+        .eq('id', authData.user.id)
+        .single();
+
+      // If banned or suspended, redirect them
+      if (profile?.approval_status === 'banned' || profile?.is_suspended) {
+        window.location.href = "/banned";
+        return;
+      }
+    }
+
+    // If everything is fine, go to account
+    window.location.href = "/account"; 
   };
 
   return (
@@ -61,7 +77,7 @@ export default function LoginPage() {
               className="w-full bg-black border border-[#1f1f1f] text-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#ef4444] transition-colors"
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-2">
             <label className="block text-sm text-gray-400 mb-2">Password</label>
             <input
               type="password"
@@ -72,6 +88,13 @@ export default function LoginPage() {
               className="w-full bg-black border border-[#1f1f1f] text-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#ef4444] transition-colors"
             />
           </div>
+          
+          <div className="flex justify-end mb-6">
+            <Link href="/forgot-password" className="text-xs text-gray-400 hover:text-[#ef4444] transition-colors">
+              Forgot password?
+            </Link>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
