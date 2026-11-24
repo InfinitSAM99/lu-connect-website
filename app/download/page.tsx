@@ -14,14 +14,10 @@ export default function Download() {
   const fetchLatest = useCallback(async () => {
     try {
       setRelease(prev => ({ ...prev, tag: "Checking for updates..." }));
-
       const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest?t=${Date.now()}`);
-
       if (!res.ok) throw new Error("API limit");
       const data = await res.json();
-
       const apk = data.assets.find((a: any) => a.name.endsWith(".apk"));
-
       if (apk) {
         setRelease({
           tag: `Latest: ${data.tag_name}`,
@@ -61,21 +57,43 @@ export default function Download() {
         </div>
       </div>
 
-      {/* YOUTUBE TUTORIAL SECTION */}
-      <div className="mt-6 bg-[#181818] border border-[#2a2a2a] rounded-[20px] p-5 text-left">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center shrink-0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      {/* REAL YOUTUBE THUMBNAIL CARD */}
+      <div className="mt-6 bg-[#181818] border border-[#2a2a2a] rounded-[20px] overflow-hidden text-left shadow-lg">
+        <a 
+          href="https://youtu.be/i_MrSAbc2D8?si=3c2t8VIw4tbYaWSP" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="block relative group"
+        >
+          {/* The Thumbnail Image */}
+          <img 
+            src="https://img.youtube.com/vi/i_MrSAbc2D8/maxresdefault.jpg" 
+            alt="How to install LU Connect"
+            className="w-full h-[200px] object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+          />
+          
+          {/* The Play Button Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.6)] group-hover:scale-110 transition-transform duration-300">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff" className="ml-1">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
           </div>
-          <div>
-            <h3 className="text-white font-bold text-[16px]">Need help getting started?</h3>
-            <p className="text-[#a1a1aa] text-[13px]">Watch our quick video guide.</p>
+
+          {/* Video Duration Badge (Fake for attraction) */}
+          <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[12px] font-bold px-2 py-1 rounded">
+            1:45
           </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <a href="https://youtu.be/i_MrSAbc2D8?si=3c2t8VIw4tbYaWSP" target="_blank" rel="noopener noreferrer" className="block w-full bg-[#27272a] hover:bg-[#3f3f46] text-white text-center py-3 rounded-xl text-sm font-semibold transition-colors">
-            🎬 Watch: How to Download & Install
-          </a>
+        </a>
+        
+        <div className="p-4">
+          <h3 className="text-white font-bold text-[16px] leading-tight">
+            How to Download & Install LU Connect on Android
+          </h3>
+          <p className="text-[#a1a1aa] text-[13px] mt-1">
+            Having trouble installing? Watch this quick guide.
+          </p>
         </div>
       </div>
 
