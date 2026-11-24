@@ -1,24 +1,44 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
 import { GITHUB_REPO, FALLBACK_APK_URL } from "@/lib/constants";
 
 export default function Download() {
-  const [release, setRelease] = useState({ tag: "Fetching latest release...", url: FALLBACK_APK_URL, size: "133 MB", name: "LU-Connect.apk" });
+  const [release, setRelease] = useState({ 
+    tag: "Fetching latest release...", 
+    url: FALLBACK_APK_URL, 
+    size: "133 MB", 
+    name: "LU-Connect.apk" 
+  });
+
+  const fetchLatest = useCallback(async () => {
+    try {
+      setRelease(prev => ({ ...prev, tag: "Checking for updates..." }));
+      
+      // Added ?t= to bypass GitHub's aggressive API caching
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest?t=${Date.now()}`);
+      
+      if (!res.ok) throw new Error("API limit");
+      const data = await res.json();
+      
+      const apk = data.assets.find((a: any) => a.name.endsWith(".apk"));
+      
+      if (apk) {
+        setRelease({ 
+          tag: `Latest: ${data.tag_name}`, 
+          url: apk.browser_download_url, 
+          size: `${(apk.size / (1024 * 1024)).toFixed(1)} MB`, 
+          name: apk.name 
+        });
+      }
+    } catch (err) {
+      setRelease((prev) => ({ ...prev, tag: "Latest Release (Fallback)" }));
+    }
+  }, []);
 
   useEffect(() => {
-    async function fetchLatest() {
-      try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
-        if (!res.ok) throw new Error("API limit");
-        const data = await res.json();
-        const apk = data.assets.find((a: any) => a.name.endsWith(".apk"));
-        if (apk) setRelease({ tag: `Latest: ${data.tag_name}`, url: apk.browser_download_url, size: `${(apk.size / (1024 * 1024)).toFixed(1)} MB`, name: apk.name });
-      } catch (err) {
-        setRelease((prev) => ({ ...prev, tag: "Latest Release (Build 16)" }));
-      }
-    }
     fetchLatest();
-  }, []);
+  }, [fetchLatest]);
 
   return (
     <div className="max-w-[500px] mx-auto py-10 text-center">
