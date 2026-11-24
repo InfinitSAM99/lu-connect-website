@@ -4,12 +4,11 @@ import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import ThemeProvider from "@/components/ThemeProvider";
 import AppWrapper from "@/components/AppWrapper";
+import LUAssistant from "@/components/LUAssistant";
 
 export const metadata: Metadata = {
   title: "LU Connect | Your Campus. Connected.",
   description: "The exclusive social network for Kenyan university students.",
-  manifest: "/manifest.json",
-  icons: { icon: "/icons/icon-192x192.png", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -26,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <AppWrapper>
             <Sidebar />
-            <div className="md:ml-[250px] flex flex-col flex-grow">
+            <div className="md:ml-[250px] flex flex-col flex-grow relative">
               <main className="flex-grow flex flex-col items-center py-10 px-5">
                 <div className="max-w-[1000px] w-full">
                   {children}
@@ -34,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </main>
               <Footer />
             </div>
+            <LUAssistant /> {/* <-- ADDED HERE */}
           </AppWrapper>
         </ThemeProvider>
       </body>
