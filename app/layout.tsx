@@ -13,6 +13,29 @@ export const metadata: Metadata = {
     icon: "/icons/icon-192x192.png",
     apple: "/icons/apple-touch-icon.png",
   },
+  // 👇 THIS IS WHAT MAKES WHATSAPP SHOW THE IMAGE 👇
+  openGraph: {
+    title: "LU Connect | Your Campus. Connected.",
+    description: "The exclusive social network for Kenyan university students.",
+    url: "https://luconnect.com", // (Replace with your actual Vercel domain later)
+    siteName: "LU Connect",
+    images: [
+      {
+        url: "/icons/icon-512x512.png", // Using your high-res icon
+        width: 512,
+        height: 512,
+        alt: "LU Connect Logo",
+      },
+    ],
+    locale: "en_KE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LU Connect | Your Campus. Connected.",
+    description: "The exclusive social network for Kenyan university students.",
+    images: ["/icons/icon-512x512.png"],
+  },
 };
 
 export const viewport: Viewport = {
