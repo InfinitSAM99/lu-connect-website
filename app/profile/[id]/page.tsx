@@ -8,11 +8,14 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // 1. Generate the Meta Tags for WhatsApp / Facebook
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  // Await the params for Next.js 16
+  const { id } = await params;
+
   const { data } = await supabase
     .from('profiles')
     .select('full_name, avatar_url')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   const name = data?.full_name || 'LU Connect Student';
@@ -25,7 +28,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       title: `${name} on LU Connect`,
       description: 'Scan to follow me on LU Connect!',
       images: [avatar],
-      url: `https://lu-connect-website-sigma.vercel.app/profile/${params.id}`,
+      url: `https://lu-connect-website-sigma.vercel.app/profile/${id}`,
       siteName: 'LU Connect',
       type: 'profile',
     },
@@ -39,6 +42,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 // 2. Render the Client Component
-export default function ProfilePage({ params }: { params: { id: string } }) {
-  return <ProfileRedirectClient userId={params.id} />;
+export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  // Await the params for Next.js 16
+  const { id } = await params;
+  
+  return <ProfileRedirectClient userId={id} />;
 }
