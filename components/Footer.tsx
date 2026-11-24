@@ -23,7 +23,7 @@ export default function Footer() {
             <h4 className="text-text font-semibold mb-3 text-xs uppercase tracking-wider">Product</h4>
             <ul className="space-y-2.5">
               <li><Link href="/download" className="text-muted hover:text-luRed transition-colors text-sm">Download App</Link></li>
-              <li><Link href="/help" className="text-muted hover:text-luRed transition-colors text-sm">Help Center</Link></li>
+              <li><Link href="/guides" className="text-muted hover:text-luRed transition-colors text-sm">Help Center</Link></li>
             </ul>
           </div>
           <div>

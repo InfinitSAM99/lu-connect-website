@@ -8,7 +8,7 @@ export default function Header() {
   const links = [
     { href: "/", label: "Home" },
     { href: "/download", label: "Download App" },
-    { href: "/help", label: "Help Center" },
+    { href: "/guides", label: "Video Guides" },
     { href: "/about", label: "About Us" },
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/contact", label: "Contact Us" },
