@@ -1,60 +1,44 @@
-"use client";
+import { Metadata } from 'next';
+import { createClient } from '@supabase/supabase-js';
+import ProfileRedirectClient from './ProfileRedirectClient';
 
-import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ShieldCheck, Download } from "lucide-react";
+// Initialize Supabase for server-side fetching
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default function ProfileRedirect() {
-  const params = useParams();
-  const router = useRouter();
-  const userId = params.id as string;
+// 1. Generate the Meta Tags for WhatsApp / Facebook
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('full_name, avatar_url')
+    .eq('id', params.id)
+    .single();
 
-  useEffect(() => {
-    if (!userId) return;
+  const name = data?.full_name || 'LU Connect Student';
+  const avatar = data?.avatar_url || 'https://lu-connect-website-sigma.vercel.app/icon.png'; // Fallback icon
 
-    // 1. Try to open the app using the deep link scheme
-    const appLink = `luconnectnative://profile/${userId}`;
-    
-    // We use a timeout to detect if the app didn't open (meaning they don't have it installed)
-    const timeout = setTimeout(() => {
-      // If the app didn't open after 2 seconds, they likely don't have it installed.
-      // We can redirect them to the download page.
-      router.push("/download");
-    }, 2000);
+  return {
+    title: `${name} on LU Connect`,
+    description: 'Connect with me on LU Connect, the exclusive social network for Kenyan university students.',
+    openGraph: {
+      title: `${name} on LU Connect`,
+      description: 'Scan to follow me on LU Connect!',
+      images: [avatar],
+      url: `https://lu-connect-website-sigma.vercel.app/profile/${params.id}`,
+      siteName: 'LU Connect',
+      type: 'profile',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${name} on LU Connect`,
+      description: 'Scan to follow me on LU Connect!',
+      images: [avatar],
+    }
+  };
+}
 
-    // Attempt to launch the app
-    window.location.href = appLink;
-
-    // If the page loses focus (app opened), clear the timeout
-    const handleBlur = () => clearTimeout(timeout);
-    window.addEventListener("blur", handleBlur);
-
-    return () => {
-      clearTimeout(timeout);
-      window.removeEventListener("blur", handleBlur);
-    };
-  }, [userId, router]);
-
-  return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-white font-sans">
-      <div className="text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-luGold/10 border border-luGold/30 mb-6 animate-pulse">
-          <ShieldCheck className="w-10 h-10 text-luGold" />
-        </div>
-        <h1 className="text-2xl font-black mb-2">Opening LU Connect...</h1>
-        <p className="text-neutral-400 text-sm">Please wait while we redirect you to the app.</p>
-        
-        <div className="mt-12">
-          <p className="text-neutral-500 text-xs mb-3">App not opening?</p>
-          <a 
-            href="/download" 
-            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full text-sm font-semibold transition-all"
-          >
-            <Download className="w-4 h-4" />
-            Download the App
-          </a>
-        </div>
-      </div>
-    </div>
-  );
+// 2. Render the Client Component
+export default function ProfilePage({ params }: { params: { id: string } }) {
+  return <ProfileRedirectClient userId={params.id} />;
 }
