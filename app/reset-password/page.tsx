@@ -1,14 +1,14 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function ResetPassword() {
+function ResetPasswordForm() {
   const supabase = createClient();
   const router = useRouter();
-  
+  const searchParams = useSearchParams();
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,32 +17,27 @@ export default function ResetPassword() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // 1. Listen for the auth state change (Supabase will parse the URL hash here)
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || session) {
-        setIsReady(true);
-      }
-    });
+    const tokenHash = searchParams.get('token_hash');
+    const type = searchParams.get('type');
 
-    // 2. Fallback: Force Supabase to parse the URL hash immediately
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        setIsReady(true);
-      } else {
-        // If no session found after 2 seconds, show an error
-        setTimeout(() => {
-          setError("Auth session missing! The link may have expired or already been used. Please request a new one.");
-        }, 2000);
-      }
-    };
-    
-    checkSession();
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [supabase]);
+    if (tokenHash && type === 'recovery') {
+      const verifyToken = async () => {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: 'recovery',
+        });
+        
+        if (error) {
+          setError("The reset link is invalid or has expired. Please request a new one.");
+        } else {
+          setIsReady(true);
+        }
+      };
+      verifyToken();
+    } else {
+      setError("Auth session missing! Please use the link from your email.");
+    }
+  }, [searchParams, supabase]);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +50,7 @@ export default function ResetPassword() {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      
+
       setSuccess(true);
       setTimeout(() => router.push("/help"), 3000);
     } catch (err: any) {
@@ -127,5 +122,13 @@ export default function ResetPassword() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#050505] text-white">Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
