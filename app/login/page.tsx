@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Image from "next/image";
 
 export default function WebLogin() {
   const [loading, setLoading] = useState(false);
@@ -11,27 +12,70 @@ export default function WebLogin() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        // This tells Supabase to redirect to our bridge page after login
         redirectTo: `${window.location.origin}/auth-callback`,
       },
     });
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white p-6">
-      <div className="w-20 h-20 border-4 border-red-500 rounded-3xl flex items-center justify-center mb-6">
-        <span className="text-4xl font-black">LU</span>
-      </div>
-      <h1 className="text-3xl font-bold mb-2">LU CONNECT</h1>
-      <p className="text-gray-400 mb-8">Log in to continue to the app</p>
+    <div className="min-h-screen bg-[#000] flex flex-col items-center justify-between py-12 px-6 relative overflow-hidden">
+      
+      {/* Background Glow (Premium touch) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-red-500/10 blur-[100px] rounded-full pointer-events-none" />
 
-      <button
-        onClick={handleGoogleLogin}
-        disabled={loading}
-        className="flex items-center gap-3 bg-white text-black px-8 py-4 rounded-xl font-bold hover:bg-gray-200 transition-colors disabled:opacity-50"
-      >
-        {loading ? "Redirecting..." : "Continue with Google"}
-      </button>
+      {/* Main Top Section */}
+      <div className="flex-1 flex flex-col items-center justify-center w-full z-10">
+        
+        {/* LU Logo */}
+        <div className="w-24 h-24 border-4 border-[#ef4444] rounded-3xl flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+          <span className="text-4xl font-black text-white">LU</span>
+        </div>
+        
+        <h1 className="text-3xl font-bold text-white mb-3 tracking-wide">LU CONNECT</h1>
+        <p className="text-[#6d7382] text-sm text-center mb-10 max-w-[250px]">
+          Connect with your university community
+        </p>
+
+        {/* Official Google Button */}
+        <button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          className="w-full max-w-[320px] flex items-center justify-center gap-3 bg-white text-[#1f1f1f] px-6 py-3.5 rounded-xl font-semibold hover:bg-gray-100 transition-all disabled:opacity-70"
+        >
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>
+              {/* Official Google Logo SVG */}
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              Continue with Google
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Footer (Infinit Co) */}
+      <div className="w-full flex flex-col items-center justify-end z-10 mt-12">
+        <div className="h-[1px] w-full max-w-[200px] bg-gradient-to-r from-transparent via-[#1f1f1f] to-transparent mb-8" />
+        
+        {/* Make sure the path to the logo is correct for Next.js public folder */}
+        <Image 
+          src="/infinit_logo.png" 
+          alt="Infinit Co Account" 
+          width={240} 
+          height={90} 
+          className="object-contain mb-3"
+          priority
+        />
+        <span className="text-[#6d7382] text-[10px] uppercase tracking-[3px] font-semibold">
+          Infinit Co Account
+        </span>
+      </div>
     </div>
   );
 }
