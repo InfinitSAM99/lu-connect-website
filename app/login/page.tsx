@@ -1,22 +1,48 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { Loader2, ArrowLeft } from "lucide-react";
+import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");                              
-  const supabase = createClient();                                     
-  
-  const handleLogin = async (e: React.FormEvent) => {                      
-    e.preventDefault();                                                    
-    setLoading(true);                                                      
+  const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  const supabase = createClient();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
     setError("");
-                                                                           
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({                                                           
+
+    if (!captchaToken) {
+      setError("Please complete the security check.");
+      setLoading(false);
+      return;
+    }
+
+    // 1. Verify the Turnstile token via our API
+    const verifyRes = await fetch('/api/verify-captcha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: captchaToken })
+    });
+    const verifyData = await verifyRes.json();
+    
+    if (!verifyData.success) {
+      setError("Security check failed. Please try again.");
+      setLoading(false);
+      turnstileRef.current?.reset();
+      return;
+    }
+
+    // 2. Attempt Login
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -24,7 +50,9 @@ export default function LoginPage() {
     if (authError) {
       setError(authError.message);
       setLoading(false);
-      // Log the failed attempt to our security table
+      turnstileRef.current?.reset(); // Reset CAPTCHA on failure
+      
+      // Log the failed attempt
       fetch('/api/log-security', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,7 +65,6 @@ export default function LoginPage() {
       return;
     }
 
-    // After successful login, check the profile status
     if (authData.user) {
       const { data: profile } = await supabase
         .from('profiles')
@@ -45,14 +72,12 @@ export default function LoginPage() {
         .eq('id', authData.user.id)
         .single();
 
-      // If banned or suspended, redirect them
       if (profile?.approval_status === 'banned' || profile?.is_suspended) {
         window.location.href = "/banned";
         return;
       }
     }
 
-    // If everything is fine, go to account
     window.location.href = "/account";
   };
 
@@ -98,6 +123,16 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Turnstile Widget */}
+          <div className="my-6 flex justify-center">
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+              onSuccess={(token) => setCaptchaToken(token)}
+              options={{ theme: 'dark' }}
+            />
+          </div>
+
           <div className="flex justify-end mb-6">
             <Link href="/forgot-password" className="text-xs text-gray-400 hover:text-[#ef4444] transition-colors">
               Forgot password?
@@ -106,21 +141,12 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !captchaToken}
             className="w-full bg-[#ef4444] hover:bg-[#dc2626] text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Log In"}
           </button>
         </form>
-
-        <div className="mt-6 text-center border-t border-[#1f1f1f] pt-6">
-          <p className="text-gray-400 text-sm">
-            Don't have an account? You can only create one on the mobile app.
-          </p>
-          <Link href="/download" className="text-[#ef4444] hover:underline text-sm mt-2 block font-semibold">
-            Download the App
-          </Link>
-        </div>
       </div>
     </div>
   );

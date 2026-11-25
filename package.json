@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@img/sharp-wasm32": "^0.35.5",
+    "@marsidev/react-turnstile": "^1.6.3",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.118.0",
     "eslint-config-next": "^16.4.6",
