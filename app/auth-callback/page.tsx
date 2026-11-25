@@ -14,28 +14,35 @@ export default function AuthCallback() {
     // 3. Try to open the app automatically
     window.location.href = appUrl;
 
-    // 4. Fallback: If the app doesn't open in 3 seconds, show a button
+    // 4. Fallback: If the app doesn't open in 2 seconds, show a button
     const timer = setTimeout(() => {
       setStatus("App didn't open automatically?");
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
+  // Allow manual click to trigger the app
+  const handleOpenApp = () => {
+    const hash = window.location.hash || window.location.search;
+    window.location.href = `luconnectnative://auth-callback${hash}`;
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', padding: '24px', textAlign: 'center' }}>
+      
       <div style={{ width: 48, height: 48, border: '4px solid #ef4444', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 24 }} />
       <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       
       <h1 style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 12 }}>{status}</h1>
       <p style={{ color: '#aab0bd', marginBottom: 32 }}>If you are not redirected, click the button below.</p>
       
-      <a 
-        href={`luconnectnative://auth-callback`} 
-        style={{ backgroundColor: '#ef4444', color: '#fff', padding: '16px 32px', borderRadius: 12, fontWeight: 'bold', textDecoration: 'none' }}
+      <button 
+        onClick={handleOpenApp} 
+        style={{ backgroundColor: '#ef4444', color: '#fff', padding: '16px 32px', borderRadius: 12, fontWeight: 'bold', textDecoration: 'none', border: 'none', fontSize: 16, cursor: 'pointer' }}
       >
         Open LU Connect App
-      </a>
+      </button>
     </div>
   );
 }
