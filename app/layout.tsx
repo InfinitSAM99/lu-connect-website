@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import ThemeProvider from "@/components/ThemeProvider";
 import AppWrapper from "@/components/AppWrapper";
 import LUAssistant from "@/components/LUAssistant";
+import VisitTracker from "@/components/VisitTracker";
 
 export const metadata: Metadata = {
   title: "LU Connect | Your Campus. Connected.",
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className="flex flex-col min-h-screen font-sans bg-black text-white">
+        <VisitTracker />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <AppWrapper>
             <Sidebar />
