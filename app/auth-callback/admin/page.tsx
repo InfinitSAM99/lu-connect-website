@@ -9,7 +9,7 @@ export default function AdminAuthCallback() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        setStatus("Success! Opening Admin App...");
+        setStatus("Success! Opening app...");
         const accessToken = session.access_token;
         const refreshToken = session.refresh_token;
 
@@ -35,7 +35,7 @@ export default function AdminAuthCallback() {
         href={`com.luconnect.admin://callback`}
         className="bg-red-500 text-white px-8 py-3 rounded-xl font-bold"
       >
-        Open Admin App Manually
+        Open App Manually
       </a>
     </div>
   );
