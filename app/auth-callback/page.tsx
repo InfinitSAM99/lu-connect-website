@@ -13,8 +13,10 @@ export default function AuthCallback() {
         const accessToken = session.access_token;
         const refreshToken = session.refresh_token;
         
-        // DEFAULT TO NATIVE APP
-        const appUrl = `luconnectnative://auth-callback#access_token=${accessToken}&refresh_token=${refreshToken}`;
+        const params = new URLSearchParams(window.location.search);
+        const redirectTarget = params.get('redirect') || 'luconnectnative://auth-callback';
+        
+        const appUrl = `${redirectTarget}#access_token=${accessToken}&refresh_token=${refreshToken}`;
 
         setTimeout(() => {
           window.location.href = appUrl;
@@ -31,10 +33,7 @@ export default function AuthCallback() {
       <h1 className="text-2xl font-bold mb-2">{status}</h1>
       <p className="text-gray-400 mb-8">Please wait...</p>
 
-      <a
-        href={`luconnectnative://auth-callback`}
-        className="bg-red-500 text-white px-8 py-3 rounded-xl font-bold"
-      >
+      <a href={`luconnectnative://auth-callback`} className="bg-red-500 text-white px-8 py-3 rounded-xl font-bold">
         Open App Manually
       </a>
     </div>

@@ -5,21 +5,30 @@ import Image from "next/image";
 
 export default function WebLogin() {
   const [loading, setLoading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState<string>('');
   const supabase = createClient();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setIsAdmin(params.get('app') === 'admin');
+    const redirectParam = params.get('redirect');
+    const appParam = params.get('app');
+
+    if (redirectParam) setRedirectUrl(redirectParam);
+    else if (appParam === 'admin') setRedirectUrl('com.luconnect.admin://callback');
+    else setRedirectUrl('luconnectnative://auth-callback');
   }, []);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    const callbackPath = isAdmin ? '/auth-callback/admin' : '/auth-callback';
+    let callbackPath = '/auth-callback';
+    if (redirectUrl.startsWith('com.luconnect.admin')) {
+      callbackPath = '/auth-callback/admin';
+    }
+    
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}${callbackPath}`,
+        redirectTo: `${window.location.origin}${callbackPath}?redirect=${encodeURIComponent(redirectUrl)}`,
       },
     });
   };
@@ -27,7 +36,6 @@ export default function WebLogin() {
   return (
     <div className="min-h-screen bg-[#000] flex flex-col items-center justify-between py-12 px-6 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-red-500/10 blur-[100px] rounded-full pointer-events-none" />
-      
       <div className="flex-1 flex flex-col items-center justify-center w-full z-10">
         <div className="w-24 h-24 border-4 border-[#ef4444] rounded-3xl flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
           <span className="text-4xl font-black text-white">LU</span>
@@ -57,7 +65,6 @@ export default function WebLogin() {
           )}
         </button>
       </div>
-
       <div className="w-full flex flex-col items-center justify-end z-10 mt-12">
         <div className="h-[1px] w-full max-w-[200px] bg-gradient-to-r from-transparent via-[#1f1f1f] to-transparent mb-8" />
         <Image src="/infinit_logo.png" alt="Infinit Co Account" width={240} height={90} className="object-contain mb-3" priority />
