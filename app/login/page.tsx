@@ -5,31 +5,21 @@ import Image from "next/image";
 
 export default function WebLogin() {
   const [loading, setLoading] = useState(false);
-  const [redirectUrl, setRedirectUrl] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const redirectParam = params.get('redirect');
-    const appParam = params.get('app');
-    
-    if (redirectParam) setRedirectUrl(redirectParam);
-    else if (appParam === 'admin') setRedirectUrl('com.luconnect.admin://callback');
-    else setRedirectUrl('luconnectnative://auth-callback');
+    setIsAdmin(params.get('app') === 'admin');
   }, []);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    
-    let callbackPath = '/auth-callback';
-    if (redirectUrl.startsWith('com.luconnect.admin')) {
-      callbackPath = '/auth-callback/admin';
-    }
-    
+    const callbackPath = isAdmin ? '/auth-callback/admin' : '/auth-callback';
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}${callbackPath}?redirect=${encodeURIComponent(redirectUrl)}`,
+        redirectTo: `${window.location.origin}${callbackPath}`,
       },
     });
   };

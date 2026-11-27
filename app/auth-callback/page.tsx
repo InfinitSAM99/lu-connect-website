@@ -9,20 +9,12 @@ export default function AuthCallback() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        setStatus("Success! Opening the app...");
+        setStatus("Success! Opening app...");
         const accessToken = session.access_token;
         const refreshToken = session.refresh_token;
-
-        // Check which app we are redirecting back to
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetApp = urlParams.get('app');
-
-        let appUrl = '';
-        if (targetApp === 'admin') {
-          appUrl = `com.luconnect.admin://callback#access_token=${accessToken}&refresh_token=${refreshToken}`;
-        } else {
-          appUrl = `luconnectnative://auth-callback#access_token=${accessToken}&refresh_token=${refreshToken}`;
-        }
+        
+        // DEFAULT TO NATIVE APP
+        const appUrl = `luconnectnative://auth-callback#access_token=${accessToken}&refresh_token=${refreshToken}`;
 
         setTimeout(() => {
           window.location.href = appUrl;
@@ -40,10 +32,10 @@ export default function AuthCallback() {
       <p className="text-gray-400 mb-8">Please wait...</p>
 
       <a
-        href={`com.luconnect.admin://callback`}
+        href={`luconnectnative://auth-callback`}
         className="bg-red-500 text-white px-8 py-3 rounded-xl font-bold"
       >
-        Open Admin App Manually
+        Open App Manually
       </a>
     </div>
   );
